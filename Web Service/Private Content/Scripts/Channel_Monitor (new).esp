@@ -1,0 +1,113 @@
+<%
+//
+// Channel_Monitor.esp
+//
+// This script presents a history of voltages and currents
+// recorded for a given channel
+
+// Inputs from the HTTP Method VI:
+// absolute channel number, crate, card, card type, channel in card, history length, total num channels
+
+var channel_num = form["Channel_Num"]; 
+var crate_num = form["Crate_Num"];
+var card_num = form["Card_Num"];
+var card_channel_num = form["Card_Channel_Num"];
+var card_type = form["Card_Type"];
+var history_length = form["History_Length"];
+var num_channels = form["Num_Channels"] * 1;
+var index_card_channels = new Array(num_channels);
+for(var i=0;i<num_channels;i++){
+	index_card_channels[i]=form["Channel_Index_"+i]; 
+}
+var ccnum = index_card_channels[channel_num];
+%>
+
+<html>
+<head>
+<!--<meta http-equiv="refresh" content="5">--> <!-- makes the page refresh once every 5 secs -->
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<script>
+	var index_card_channel = new Array(@@num_channels);
+<% 	for(var i=0;i<num_channels;i++){
+		write('index_card_channel['+i+']="'+index_card_channels[i]+'";');
+	}
+%>
+</script>
+	
+	<title>Channel Monitor</title>
+	<input type="hidden" id="channel_number_hidden" value="@@channel_num"/><!-- for passing to external monitor_graph.js script-->
+	<!--Load the Google Charts Javascript API-->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	
+	<script type="text/javascript" src="/CAEN_HV/monitor_graph.js"></script>			<!--Load the graph script--> 
+	<script> RequestData(); </script> <!-- call to load the data-->
+</head>
+
+<body>
+	<h1>Channel Monitor</h1> <!--style="color:blue"-->
+    
+	<!--Div that will hold the graph-->
+   	<div id="chart_div"></div>
+	<br><br>
+	<!--Pressing this button will call the RequestData() function to refresh the data-->
+	<!-- <input type="button" value="Update Graph" onclick="RequestData()" /> --> <!-- leave it to autorefresh -->
+	
+
+	<!-- Input to change channel number -->
+	<form id="sethistorylength" action="/CAEN_HV/Channel_Monitor/SetHistoryLength" method="post">
+	<input type="number" id="channel_num" min="0" max="@@num_channels" step="1" name="channel_num" value="@@channel_num" onchange="formfunc(this);" />
+	<label for="input_channel_number"> Channel Index</label>
+	<br><br>
+	<input type="text" id="cardchannel" name="cardchannel" pattern="^(0.(0[0-9]|10)|[12]\.(0[0-9]|1[0-6]))\.(0[0-9]|1[0-6])$" value="0.00.00" onchange="formfunc(this);"/>
+	<label for="cardchannel"> Crate.Card.Channel</label>
+	<br><br>
+	<!-- Input to change history length -->
+	<input type="number" name="history_length" id="history_length" min="1" step="1" value="@@history_length" onchange="formfunc(this);"/>
+	<label for="history_length"> History Length</label>
+	</form>
+	Note: This history length will be applied to all channels. Data older than the history length will be discarded, and you must wait for new data to reaccumulate in order to increase history length again. (This does not affect logging.) <br>
+	<script>
+	var startingchannel = "@@ccnum";
+	var test = "@@ccnum";
+	var test2 = /[0-9]+\.[0-9][0-9]/.exec(test);
+	//startingchannel = startingchannel.toFixed(2)
+	//document.getElementById("cardchannel").value = startingchannel.toString();
+	document.getElementById("cardchannel").value = startingchannel;
+	</script>
+<script>
+function formfunc(caller){
+	var asom=caller.name;
+	if (caller.name=="channel_num"){	
+		var newcardchannel = index_card_channel[caller.value];
+		document.getElementById("channel_number_hidden").value = caller.value;
+		document.getElementById("cardchannel").value = newcardchannel.toFixed(2);
+		RequestData();
+	} else if(caller.name=="history_length"){
+		document.getElementById("sethistorylength").submit();
+		//RequestData();
+	} else if(caller.name=="cardchannel"){
+		//var newcardchan = Number(caller.value);
+		var newcardchan = caller.value;
+		var newindex = index_card_channel.indexOf(newcardchan);
+		if(newindex!=-1){
+			document.getElementById("channel_number_hidden").value = newindex;
+			document.getElementById("channel_num").value=newindex;
+			RequestData();
+		} else {
+			var oldindex = document.getElementById("channel_num").value;
+			document.getElementById("cardchannel").value = index_card_channel[oldindex];
+			alert("new card chan is ")
+			alert(newcardchan);
+			alert("newindex is ");
+			alert(newindex);
+			alert("Not a valid channel");
+		}
+	}
+};
+</script>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+	
+</body>
+</html>

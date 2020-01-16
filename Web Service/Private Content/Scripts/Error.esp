@@ -1,0 +1,26 @@
+<%
+//
+// ViewAll.esp
+//
+// This script shows an error message and provides a link back.
+//
+// Inputs from the HTTP Method VI:
+//
+//		link:			A URL for the Back link.
+//		message:	The error message to display.
+//    
+// Variables are retrieved by name using the form['varname'] construct.
+// We store the retrieved values in local variables to be able to
+// use them in the rendered text as '@@varname'.
+
+var link = form["link"];
+var message = form["message"];
+%>
+<html>
+<title>CAEN HV Web Service Error</title>
+<body>
+<h1>Error</h1>
+<p>@@message</p>
+<p><a href="@@link">Back</a></p>
+</body>
+</html>

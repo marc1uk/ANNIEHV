@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Caen HV Control & Monitor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+</head>
+
+<body>
+    <h1>CAEN SY527</h1>
+    <ul>
+	<!-- "CAEN_HV" root comes from web service name in project
+	subdirectories name web resources (folders) within project
+	if only one (GET?) file is included its URL will be that of the resource
+	if more than one (GET?) file is present in the resource, the root one is specified by 'GET - /'
+	(don't currently know how to change this...maybe when it's created?) -->
+	<li><a href="/CAEN_HV/Summary_Page/">View Summary Page</a></li>
+	<!-- <li><a href="/CAEN_HV/Group_Control/">Group Control</a></li> -->
+	<li><font color='blue'><u><a onClick="passwordcheckgroup();" style="color: blue; cursor: pointer; cursor: hand;">Group Control</a></u></font></li>
+        <li><a href="/CAEN_HV/Crate_Map/">View Crate Maps</a></li>
+        <li><a href="/CAEN_HV/Channel_Table/">View Channel Table</a></li>
+	<li><a href="/CAEN_HV/Channel_Monitor/">View Channel Monitor</a></li>
+	<!-- <a href="/CAEN_HV/Channel_Config/">View Channel Config</a></li> -->
+	<li><font color='blue'><u><a onClick="passwordcheckchan();" style="color: blue; cursor: pointer; cursor: hand;">View Channel Config</a></u></font></li>
+	<li><a href="/CAEN_HV/Screen_Emulation/">View Terminal Emulation</a></li>
+	<li><a href="/CAEN_HV/Config/">View Config Page</a></li>
+	<li><a href="/CAEN_HV/Event_Log/">Event Log</a></li>
+	<li><a href="/CAEN_HV/Software_Log/">Software Log</a></li>
+	<li><a href="/CAEN_HV/Alarm_Screencap/">View Screen at Last Alarm</a></li>
+	<!-- set the URLS vis use in the properties window of the Web SERVICE (not the vi or resource)-->
+
+    </ul>
+
+<script>
+  function passwordcheckchan() {
+    	var pass = prompt("Enter password", "");
+    	if (pass != "annieadmin16") {
+        	alert("Invalid password");
+    	} else {
+		window.location.assign("/CAEN_HV/Channel_Config/?Channel=0");
+    	}
+  }
+  function passwordcheckgroup() {
+    	var pass = prompt("Enter password", "");
+    	if (pass != "annieadmin16") {
+        	alert("Invalid password");
+    	} else {
+		window.location.assign("/CAEN_HV/Group_Control/");
+    	}
+  }
+</script>
+</body>
+</html>

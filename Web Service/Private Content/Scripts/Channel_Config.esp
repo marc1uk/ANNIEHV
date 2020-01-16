@@ -1,0 +1,123 @@
+<%
+//
+// ChannelConfig.esp
+//
+// This script shows current channel settings and lets the user edit those that are writeable
+//
+// Channel Settings:
+// Channel, HVmax, Vmon, Imon, V*set, I*set, Pw, Status, Ch#
+// Channel, SVmax, Rup, Rdwn, Trip, TripEx, PrOn, PrOff, Pon, Pdwn, Pswd, On/Off, Ch#
+//
+
+var channel_index = form["Channel_Index"];
+var card_type = form["Card_Type"];
+var card_num = form["Card_Number"];
+var card_channel_number = form["Card_Channel_Number"];
+var crate_number = form["Crate_Number"];
+var channel_name = form["Channel_Name"];
+var channel_number = form["Channel_Number"];
+var vset = form["Vset"];
+var vmon = form["Vmon"];
+var iset = form["Iset"];
+var imon = form["Imon"];
+var enable = form["Enable"];
+var timestamp = form["Timestamp"];
+var vset_max = form["Vset_Max"];
+var vset_min = form["Vset_Min"];
+var iset_max = form["Iset_Max"];
+var num_channels = form["Num_Channels"];
+var flag = form["Flag"];
+
+%>
+
+<html>
+<title>Channel Configuration</title>
+<body>
+<h1>Channel Settings</h1>
+<b>Active Group Channel Index</b>: @@channel_index<br>
+<b>Crate</b>: @@crate_number<br>
+<b>Card</b>: @@card_num<br>
+<!--<b>Card Type</b>: @@card_type<br> -->
+<b>Card Channel</b>: @@card_channel_number<br>
+<b>Channel Name:</b> <!--@@channel_name<br>-->
+<form action="/CAEN_HV/Channel_Config/SetChannelName" method="post">
+	<input name="channel_name" value="@@channel_name" /> <input type="submit" value="Change"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+</form>
+<b>Set Voltage</b>:
+<form action="/CAEN_HV/Channel_Config/SetChannelVset" method="post">
+	<input name="vset" type="number" max="@@vset_max" min="@@vset_min" value="@@vset" /> <input type="submit" value="Change"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+</form>
+<b>Monitored Voltage</b>: @@vmon<br>
+<b>Current Limit (uA)</b>:
+<form action="/CAEN_HV/Channel_Config/SetChannelIset" method="post">
+	<input name="iset" type="number" max="@@iset_max" min="0" value="@@iset" /> <input type="submit" value="Change"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+</form>
+<b>Monitored Current (uA)</b>: @@imon<br>
+<b>Enable Status</b>: @@enable<br>
+<form action="/CAEN_HV/Channel_Config/SetChannelEnable" method="post">
+<% if (enable=="1"){ %>
+	<input name="enable" type="submit" value="Disable"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+<% } else { %>
+	<input name="enable" type="submit" value="Enable"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+<%% } %>
+</form>
+<form action="/CAEN_HV/Channel_Config/SetChannelFlag" method="post">
+<% if (flag=="1"){ %>
+	<input name="flag" type="submit" value="Remove Flag"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+<% } else { %>
+	<input name="flag" type="submit" value="Add Flag"/>
+	<input name="crate_number", type="hidden" value="@@crate_number" />
+	<input name="channel_number" type="hidden" value="@@channel_number" />
+	<input name="channel_index" type="hidden" value="@@channel_index" />
+<%% } %>
+</form>
+<b> Timestamp</b>: @@timestamp<br>
+
+<br><br>
+
+<% if(channel_index==0){ %>
+	<input type="submit" value="Previous Channel" disabled onclick="prevchannel();" /> <br><br>
+<% } else { %>
+	<input type="submit" value="Previous Channel" onclick="prevchannel();" /> <br><br>
+<% } %>
+<% if(channel_index<(num_channels-1)){ %>
+	<input type="submit" value="Next Channel" onclick="nextchannel();" /> <br><br>
+<% } else { %>
+	<input type="submit" value="Next Channel" disabled onclick="nextchannel();" /> <br><br>
+<% } %>
+
+<script>
+	function prevchannel(){
+		var newchannelnum=@@channel_index;
+		newchannelnum=newchannelnum-1;
+		window.location.replace("?Channel="+newchannelnum);
+	};
+	function nextchannel(){
+		var newchannelnum=@@channel_index;
+		newchannelnum=newchannelnum+1;
+		window.location.replace("?Channel="+newchannelnum);
+	};
+</script>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>
+

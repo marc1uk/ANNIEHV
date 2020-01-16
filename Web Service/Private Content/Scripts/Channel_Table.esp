@@ -1,0 +1,145 @@
+<%
+//
+// ViewAll.esp
+//
+// This script presents a list of channels with links to view full channel details, monitor it, 
+// or return to the main menu
+
+// Inputs from the HTTP Method VI:
+// ON, status, name, crate, card type, card, chan, vmon, vset, imon, imax, timestamp
+//
+
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var num_channels = form["num_channels"]*1;
+//GetNumberOfChannels(); //retrieve using function in common funcs. 
+%>
+
+<html>
+<head>
+<!-- <meta http-equiv="refresh" content="10"> --> <!-- makes the page refresh once every 5 secs -->
+<script src="../jquery-3.4.1.min.js"></script>       <!-- load jquery -->
+<script src="../paginate_table_jquery.js"></script>  <!-- load pagination function -->
+<link rel="../stylesheet" href="styles.css">         <!-- load css stylesheet which specifies pagination style for this table? -->
+<script language="JavaScript">
+function readCookie(name){
+	return(document.cookie.match('(|; )'+name+'=([;]*)')||0)[2]
+}
+
+function startRefresh() {
+	// reload content
+	$.get('', function(data) {
+		$(document.body).html(data);
+	});
+}
+$(function() {
+    setTimeout(startRefresh,1000);
+});
+
+</script>
+</head>
+<title>CAENSY527 - Channel Table</title>
+<body onScroll="document.cookie='ypos=' + window.pageYOffset" onLoad="javascript:startRefresh()">
+
+<h1>Channel Array</h1>
+<p>Total HV Channels: @@num_channels</p>	<!-- can use @@ to refer to variables defined above -->
+<table border="1" id="potato">
+	<thead>
+		<tr>
+<%
+			//WriteChannelArrayHeader(); // just prints header lines as below
+%>
+			<th>&nbspEnable&nbsp</th>	<!-- <th> </th> defines an html header cell -->
+			<th>&nbspStatus&nbsp</th>
+			<th>&nbspName&nbsp</th>
+			<!--<th>Crate</th>-->
+			<th>&nbspCard&nbsp</th>
+			<th>&nbspChannel&nbsp</th>
+			<th>&nbspVmon&nbsp</th>
+			<th>&nbspVset&nbsp</th>
+			<!-- <th>&nbspVswmax&nbsp</th> -->
+			<th>&nbspImon&nbsp</th>
+			<th>&nbspImax&nbsp</th>
+			<th>&nbspTimestamp&nbsp</th>
+			<th>&nbspFlag&nbsp</th>
+			<th>&nbsp</th> <!-- blank column header at the end for monitoring link -->
+			<th>&nbsp</th> <!-- blank column header at the end for configuring link -->
+		</tr>
+	</thead>
+	<tbody>
+<%
+	// Generate a row for each channel.
+	for (var i = 0; i < num_channels; i++)
+	{
+%>    
+		<tr>
+<% 
+			//WriteChannelData(i); // or make this form editable?
+			var enablestring = "";
+			var maincolourstring = "";
+			if(form["Enable"+i]=="1"){
+				enablestring="ON";
+				maincolourstring="black";
+				write('<td style="color: green">' + enablestring + '</td>\n');	// <td> </td> defines an html table cell
+			} else {
+				enablestring="OFF";
+				maincolourstring="grey";
+				write('<td style="color: red">' + enablestring + '</td>\n');	// <td> </td> defines an html table cell
+			}
+			write('<td style="color: ' + maincolourstring + '">' + form["Status"    + i] + '</td>\n');	
+			//td.setAttribute('style', 'color: red');
+			write('<td style="color: ' + maincolourstring + '">' + form["Name"      + i] + '</td>\n');
+			//write('<td style="color: ' + maincolourstring + '">' + form["Crate"     + i] + '</td>\n');
+			write('<td style="color: ' + maincolourstring + '">' + form["Card_Num"  + i] + '</td>\n');
+			write('<td style="color: ' + maincolourstring + '">' + form["Channel"   + i] + '</td>\n');
+			var vmonasnum = 1.0*form["Vmon" + i];
+			var vsetasnum = 1.0*form["Vset" + i];
+			var Voltsdiff = ((vmonasnum) - (vsetasnum));
+			if(Voltsdiff<0) Voltsdiff = -1.0*Voltsdiff;
+			if(((Voltsdiff+15)>0)&&(Voltsdiff<15)){     // if -15 < Voltsdiff < 15
+				write('<td style="color: green">&nbsp' + form["Vmon" + i]+ '&nbsp</td>\n');
+			} else {
+				if(enablestring=="ON"){
+					write('<td style="color: red">&nbsp' + form["Vmon" + i] + '&nbsp</td>\n');
+				} else {
+					write('<td style="color: orange">&nbsp' + form["Vmon" + i] + '&nbsp</td>\n');
+				}
+			}
+			write('<td style="color: ' + maincolourstring + '">&nbsp' + form["Vset"      + i] + '&nbsp</td>\n');
+			//write('<td style="color: ' + maincolourstring + '">' + form["Vsw_Max"	+ i] + '</td>\n');
+			var istring = form["Imon"+i];
+			if(form["Crate" + i]!=0){ istring="--"; }
+			write('<td style="color: ' + maincolourstring + '">&nbsp' + istring + '&nbsp</td>\n');
+			write('<td style="color: ' + maincolourstring + '">&nbsp' + form["Imax"      + i] + '&nbsp</td>\n');
+			write('<td style="color: ' + maincolourstring + '">&nbsp' + form["Timestamp" + i] + '&nbsp</td>\n');
+			//write('<td>&nbsp' + form["Flag"      + i] + '&nbsp</td>\n');
+			if(form["Flag"+i]=="1"){ 
+				write('<td>&nbsp&nbsp&nbsp<img src="../flag_icon.png" alt="1" style="width:18px;height:17px;"></td>\n');
+			} else {
+				write('<td>&nbsp' + " " + '&nbsp</td>\n');
+			}
+%>
+			<td><font color='blue'><u><a href="/CAEN_HV/Channel_Monitor/?Channel=@@i">&nbspMonitor&nbsp</a></u></font></td> <!-- monitoring link -->
+			<!-- td><a href="/CAEN_HV/Channel_Config/?Channel=@@i">&nbspConfigure&nbsp</a>--></td> <!-- configuring link -->
+			<td><font color='blue'><u><a onClick="passwordcheck(@@i);" style="cursor: pointer; cursor: hand;">Configure</a></u></font> <!-- password protected configure link -->
+		</tr>
+<%  
+	}
+%>
+	</tbody>
+</table>
+
+<script>
+  function passwordcheck(chan) {
+    	var pass = prompt("Enter password", "");
+    	if (pass != "annieadmin16") {
+        	alert("Invalid password");
+    	} else {
+		window.location.replace("../Channel_Config/?Channel="+chan);
+    	}
+   }
+</script>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

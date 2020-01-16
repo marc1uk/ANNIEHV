@@ -1,0 +1,98 @@
+<%
+//
+// GroupConfig.esp
+//
+// This script shows current channel settings and lets the user edit those that are writeable
+//
+// Channel Settings:
+// Groups, Group_Properties, Error (to return to this page if validation of entered text fails)
+//
+
+var group_names = form["Group_Names"];
+var group_properties = form["Group_Properties"];
+var validation_error = form["Error"];
+
+%>
+
+<html>
+<head>
+<title>Set Group Properties</title>
+<script> 
+window.onload = function(){
+	var garr = "@@group_names";
+	var groups_array = garr.split(",");
+	var select_group = document.getElementById("group");
+	for(var i=0; i<groups_array.length; i++){
+		var group_option = document.createElement("option");
+		group_option.value = groups_array[i];
+		group_option.innerHTML=groups_array[i];
+		select_group.appendChild(group_option);
+	}
+
+	var parr = "@@group_properties";
+	var properties_array = parr.split(",");
+	var select_prop = document.getElementById("property");
+	for(var i=0; i<properties_array.length; i++){
+		var par_option = document.createElement("option");
+		par_option.value = properties_array[i];
+		par_option.innerHTML=properties_array[i];
+		select_prop.appendChild(par_option);
+	}
+}
+</script>
+</head>
+<body>
+<h1>Set Group Properties</h1>
+
+<form action="/CAEN_HV/Group_Control/SetGroupProperty" method="post">
+
+	<b>Group&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+	<select name="group" id="group"></select><br><br>
+
+
+	<b>Property&nbsp;&nbsp;&nbsp;</b>
+	<select name="property" id="property" onchange="setformat(this)" value=""></select><br><br>
+
+	<b>Value&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
+	<input name="value" id="value" type="number" max="1" min="0" step="1" /> <br>
+	<span id="note">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X (1/0)</span><br><br>
+	<script>
+	function setformat(property){
+		var note = document.getElementById("note");
+		var selgroup = document.getElementById("group").value;
+		var valfield = document.getElementById("value");
+		switch(property.value){
+			case "Enable": note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;X (1/0)";
+				valfield.max="1"; valfield.step="1"; break;
+			case "Vset": note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XXXX . XX (V)";
+				valfield.max="9999.99"; valfield.step = "0.01"; break;
+			case "Imax": note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XXXX . XXX (uA)";
+				valfield.max="999999.999"; valfield.step="0.001"; break;
+			case "Vswmax": note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XXXX (V)";
+				valfield.max="9999"; valfield.step="1"; break;
+			case "Trip Time": note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;XXX . X (0.1s)";
+				valfield.max="999.9"; valfield.step = "0.1"; break;
+			default: note.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unrecognised property"; break;
+		}
+	}
+	</script>
+	
+	<input type="submit" value="Set"/>
+</form>
+
+<form action="/CAEN_HV/Group_Control/RestoreNominalVoltages" method="post">
+	<p><input type="submit" value="Restore Nominal Voltages" /></p>
+</form>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+
+<script>
+	function display(msg) { 
+		var p = document.createElement('p');
+		p.innerHTML = msg;
+		document.body.appendChild(p);
+	}
+</script>
+</body>
+</html>
+

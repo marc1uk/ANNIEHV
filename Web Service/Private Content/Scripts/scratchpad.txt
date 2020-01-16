@@ -1,0 +1,98 @@
+<table border="1">
+	<thead>
+		<tr>
+<%
+			//WriteChannelArrayHeader(); // just prints header lines as below
+%>
+			<th>Enable</th>	<!-- <th> </th> defines an html header cell -->
+			<th>Status</th>
+			<th>Name</th>
+			<th>Crate</th>
+			<th>Card Type</th>
+			<th>Card Num</th>
+			<th>Channel</th>
+			<th>Vmon</th>
+			<th>Vset</th>
+			<th>Imon</th>
+			<th>Imax</th>
+			<th>Timestamp</th>
+			<th>&nbsp</th> <!-- blank column header at the end for monitoring link -->
+		</tr>
+	</thead>
+	<tbody>
+<%
+	// Generate a row for each channel.
+	for (var i = 0; i < num_channels; i++)
+	{
+%>    
+		<tr>
+<% 
+			//WriteChannelData(i); // or make this form editable?
+			write('<td>' + form["Enable"    + i] + '</td>\n');	// <td> </td> defines an html table cell
+			write('<td>' + form["Status"    + i] + '</td>\n');	
+			write('<td>' + form["Name"      + i] + '</td>\n');
+			write('<td>' + form["Crate"     + i] + '</td>\n');
+			write('<td>' + form["Card_Type" + i] + '</td>\n');
+			write('<td>' + form["Card_Num"  + i] + '</td>\n');
+			write('<td>' + form["Channel"   + i] + '</td>\n');
+			write('<td>' + form["Vmon"      + i] + '</td>\n');
+			write('<td>' + form["Vset"      + i] + '</td>\n');
+			write('<td>' + form["Imon"      + i] + '</td>\n');
+			write('<td>' + form["Imax"      + i] + '</td>\n');
+			write('<td>' + form["Timestamp" + i] + '</td>\n');
+%>
+			<td><a href="/CAEN_HV/Channel_Monitor/@@i">Monitor</a></td> <!-- monitoring link -->
+		</tr>
+<%  
+	}
+%>
+	</tbody>
+</table>
+
+
+window.onload=function(){ 
+    window.setTimeout(function() { document.cartCheckout.submit(); }, 5000);
+};
+
+
+<style type="text/css">
+#btnSetNewLog { 	/* can list multiple items as comma delimited list! */
+display: none;
+}
+
+function display(msg) {
+  var p = document.createElement('p');
+  p.innerHTML = msg;
+  document.body.appendChild(p);
+}
+
+	<label for="ChanLogFile"> Select any file in the desired directory (create a new one if required). </label> <br>
+	<input type="file" name="ChanLogFile" id="ChanLogFile" onclick="showNewLogButton(this);" />
+
+	//document.getElementById("btnSetNewLog").style.visibility='hidden';	// initial setting on page loads
+	document.getElementById("btnSetNewLog").disabled='true';		// initial setting on page loads
+	function showNewLogButton(ChanLogFile) { 
+		var oldlogfile = @@chan_log_file;
+		var newlogfile = ChanLogFile.value;
+		if (oldlogfile == newlogfile) {
+			document.getElementById("btnSetNewLog").disabled='true';
+		} else {
+			//document.getElementById("btnSetNewLog").style.visibility='visible';
+			document.getElementById("btnSetNewLog").disabled='false';
+		}
+	}
+
+
+<form action="/CAEN_HV/Config/SetErrorLog" method="post" enctype="multipart/form-data" id="SetErrorLogForm">
+	<b>Log File:</b> @@error_log
+	<label for="dataFile"> Please create a new file with the desired name if necessary.  Existing files will be appended to:</label>
+	<input type="file" name="ErrLogFile" id="ErrLogFile" onclick="setLogFile(this); />
+	<script>
+		function setLogFile(ErrLogFile) { 
+	  	document.getElementById("SetErrorLogForm").submit();
+		}
+	</script>
+	<noscript>
+		<p><input type="submit" value="Set Log File" /></p>
+	</noscript>
+</form>

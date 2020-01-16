@@ -1,0 +1,168 @@
+//
+// Common.ejs
+//
+// Provides common functionality for other ESP scripts to include.
+
+// Returns the number of contacts in the list.
+function GetNumberOfChannels()
+{
+	// Important: All values retrieved from the form[] hash are strings,
+	// but we want the 'length' as a number for use in a for() statement.  
+	// Make Javascript turn it into a number by multiplying by 1.
+	return form["num_channels"] * 1;
+}
+
+// Returns the ID of the contact in the list at index.
+//function GetContactID(index)
+//{
+//	return form["id" + index];
+//}
+
+// Outputs the HTML of a table header for each element in the contact data.
+function WriteChannelArrayHeader()
+{
+//	var sortMode = form["sortMode"] * 1; // Retrieve the sortMode as a number
+// sortMode specifies which column to sort by - not using
+//	var ascending = form["ascending"];
+// specify ascending/descending - not using
+//	var sortArrow = new Array();
+// empty array. Only the column which is being used for sorting is set to nonempty (an arrow char). This is then appended to all column headers.
+//	var sortAscending = new Array();
+// empty array. Only the column which is being used for sorting is set to nonempty. This is appended to all column header links.
+// the sorting header URL is appended with &ascending=0 for changing ascending/descending. not using.
+//
+//	// Only set the values in the sortArrow and sortAscending arrays for the
+//	// element at index sortMode. All other values will remain empty.
+//	if (ascending == "1")
+//	{
+//		sortAscending[sortMode] = "&amp;ascending=0"; // Toggle off ascending.
+//		sortArrow[sortMode] = " &#9650;"; // Up arrow.
+//	}
+//	else
+//	{
+//		sortArrow[sortMode] = " &#9660;"; // Down arrow.
+//	}
+//	
+//	// In EJS, the write function provides the same functionality as text
+//	// outside of the <% %> tag in ESP.
+//	write('<th><a href="' + pageURL + 'sortMode=1' + sortAscending[1] + '">Last Name' + sortArrow[1] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=2' + sortAscending[2] + '">First Name' + sortArrow[2] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=3' + sortAscending[3] + '">Middle Name' + sortArrow[3] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=4' + sortAscending[4] + '">Phone' + sortArrow[4] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=5' + sortAscending[5] + '">Street' + sortArrow[5] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=6' + sortAscending[6] + '">City' + sortArrow[6] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=7' + sortAscending[7] + '">State' + sortArrow[7] + '</a></th>\n');
+//	write('<th><a href="' + pageURL + 'sortMode=8' + sortAscending[8] + '">Postal Code' + sortArrow[8] + '</a></th>\n');
+// e.g. <th><a href="/AddressBook/Contacts/?sortMode=8">Postal Code</a></th>
+// where sortmode=8 means sort by post code
+
+//ON, status, name, crate, card type, card, chan, vmon, vset, imon, imax, timestamp
+	// In EJS, the write function provides the same functionality as text
+	// outside of the <% %> tag in ESP.
+	write('<th>Enable</th>\n');	// <th> </th> defines an html header cell
+	write('<th>Status</th>\n');
+	write('<th>Name</th>\n');
+	write('<th>Crate</th>\n');
+	write('<th>Card Type</th>\n');
+	write('<th>Card Num</th>\n');
+	write('<th>Channel</th>\n');
+	write('<th>Vmon</th>\n');
+	write('<th>Vset</th>\n');
+	write('<th>Imon</th>\n');
+	write('<th>Imax</th>\n');
+	write('<th>Timestamp</th>\n');
+}
+
+// Output the HTML of table row for each element in the contact data. - Not sure this can be used if this is to be editable
+function WriteChannelData(i)	// I SUSPECT the function argument must be a defined variable - can't rename it!!
+{
+	write('<td>' + form["Enable"    + i] + '</td>\n');	// <td> </td> defines an html table cell
+	write('<td>' + form["Status"    + i] + '</td>\n');	
+	write('<td>' + form["Name"      + i] + '</td>\n');
+	write('<td>' + form["Crate"     + i] + '</td>\n');
+	write('<td>' + form["Card_Type" + i] + '</td>\n');
+	write('<td>' + form["Card_Num"  + i] + '</td>\n');
+	write('<td>' + form["Channel"   + i] + '</td>\n');
+	write('<td>' + form["Vmon"      + i] + '</td>\n');
+	write('<td>' + form["Vset"      + i] + '</td>\n');
+	write('<td>' + form["Imon"      + i] + '</td>\n');
+	write('<td>' + form["Imax"      + i] + '</td>\n');
+	write('<td>' + form["Timestamp" + i] + '</td>\n');
+}
+
+function WriteCrateHeader() 	// write table header for crate map
+{
+// num_crates, Crate_Address#, Crate_Model#, Crate_FWVer#, Crate_NumCards#; where # = crate index(from 0!)
+	write('<th>CAENet Address</th>\n');
+	write('<th>Model</th>\n');
+	write('<th>Firmware</th>\n');
+	write('<th>Num Cards</th>\n');
+	write('<th>Slot</th>\n');
+	write('<th>Model</th>\n');
+	write('<th>Num Channels</th>\n');
+	write('<th>Polarity</th>\n');
+	write('<th>Vmax (V)</th>\n');
+	write('<th>Imax (mA/ch)</th>\n');
+	write('<th>Revision</th>\n');
+}
+
+function WriteCardHeader()	// write table header for card rows - not used, combined header.
+{
+// Slot_Num#.#, Card_Model#.#, Num_Channels#.#, Polarity#.#, Vmax#.#, Imax#.#, Revision#.#; where #.# is
+	write('<th>&nbsp</th>\n');
+	write('<th>Slot</th>\n');
+	write('<th>Model</th>\n');
+	write('<th>Num Channels</th>\n');
+	write('<th>Polarity</th>\n');
+	write('<th>Vmax</th>\n');
+	write('<th>Imax</th>\n');
+	write('<th>Revision</th>\n');
+}
+
+function WriteCrateData(crate)
+//Crate_Address#, Crate_Model#, Crate_FWVer#, Crate_NumCards#
+{
+	write('<td>' + form["Crate_Address"  + crate] + '</td>\n');	// <td> </td> defines an html table cell
+	write('<td>' + form["Crate_Model"    + crate] + '</td>\n');	
+	write('<td>' + form["Crate_FWVer"    + crate] + '</td>\n');
+	write('<td>' + form["Crate_NumCards" + crate] + '</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');	// these columns filled out with card data
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+}
+function WriteCardData(crate, card)
+// Slot_Num#.#, Card_Model#.#, Num_Channels#.#, Polarity#.#, Vmax#.#, Imax#.#, Revision#.#
+{
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>&nbsp</td>\n');
+	write('<td>' + form["Crate_Address" + crate + '.' + card] + '</td>\n');	// <td> </td> defines an html table cell
+	write('<td>' + form["Slot_Num"      + crate + '.' + card] + '</td>\n');	
+	write('<td>' + form["Card_Model"    + crate + '.' + card] + '</td>\n');
+	write('<td>' + form["Num_Channels"  + crate + '.' + card] + '</td>\n');
+	write('<td>' + form["Polarity"      + crate + '.' + card] + '</td>\n');
+	write('<td>' + form["Vmax"          + crate + '.' + card] + '</td>\n');
+	write('<td>' + form["Imax"          + crate + '.' + card] + '</td>\n');
+	write('<td>' + form["Revision"      + crate + '.' + card] + '</td>\n');
+}
+
+/*function passwordcheckchan() {
+    	var pass = prompt("Enter password", "");
+    	if (pass != "annieadmin16") {
+        	alert("Invalid password");
+    	} else {
+		window.location.assign("/CAEN_HV/Channel_Config/?Channel=0");
+    	}
+}
+function passwordcheckgroup() {
+  	var pass = prompt("Enter password", "");
+    	if (pass != "annieadmin16") {
+        	alert("Invalid password");
+    	} else {
+		window.location.assign("/CAEN_HV/Group_Control/");
+    	}
+}*/

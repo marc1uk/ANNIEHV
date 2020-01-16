@@ -1,0 +1,23 @@
+<%
+//
+// Terminal_Emulation.esp
+//
+// This script shows the current display as internally reconstructed 
+// Inputs from the HTTP Method VI:
+// Display
+
+var display = form["Display"];
+%>
+
+<html>
+<title>CAENSY527 - Terminal Emulation</title>
+<head> <meta http-equiv="refresh" content="3"> </head>	<!-- makes the page refresh once every 5 secs -->
+<body>
+<h1>Current Screen</h1>
+<pre style="font-family: 'Lucida Console', Monaco, monospace; font-size: 12px; line-height: 8px">
+@@display
+</pre>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

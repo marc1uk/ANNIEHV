@@ -1,0 +1,91 @@
+<%
+//
+// View.esp
+//
+// This script views the data associated with a contact.
+//
+// Inputs from the HTTP Method VI:
+//
+//		editLink:		A URL to allow the user to edit the contact.
+//		deleteLink:	A URL to allow the user to delete the contact.
+//		cancelLink:	A URL for returning back.
+//		id:				The ID of the contact being viewed.
+//		lname:			The last name for the contact.
+//		fname:			The first name for the contact.
+//		mname:		The middle name for the contact.
+//		phone:			The phone number for the contact.
+//		street:			The street address for the contact.
+//		city:				The city for the contact.
+//		state:			The state for the contact.
+//		postal:			The postal code for the contact.
+//		favorite:		1 if the contact is a favorite, 0 if not.
+//    
+// Variables are retrieved by name using the form['varname'] construct.
+// We store the retrieved values in local variables to be able to
+// use them in the rendered text as '@@varname'.
+//
+//
+var editLink = form["editLink"];
+var deleteLink = form["deleteLink"];
+var cancelLink = form["cancelLink"];
+
+var id = form["id"];
+var lname = form["lname"];
+var fname = form["fname"];
+var mname = form["mname"];
+var phone = form["phone"];
+var street = form["street"];
+var city = form["city"];
+var state = form["state"];
+var postal = form["postal"];
+var favorite = form["favorite"];
+%>
+<html>
+<title>View Contact - Address Book</title>
+<body>
+<h1>View Contact</h1>
+<table border="0">
+	<tbody>
+	<tr>
+		<td>Last Name:</td>
+		<td>@@lname</td>
+	</tr>
+	<tr>
+		<td>First Name:</td>
+		<td>@@fname</td>
+	</tr>
+	<tr>
+		<td>Middle Name:</td>
+		<td>@@mname</td>
+	</tr>
+	<tr>
+		<td>Phone:</td>
+		<td>@@phone</td>
+	</tr>
+	<tr>
+		<td>Street:</td>
+		<td>@@street</td>
+	</tr>
+	<tr>
+		<td>City:</td>
+		<td>@@city</td>
+	</tr>
+	<tr>
+		<td>State:</td>
+		<td>@@state</td>
+	</tr>
+	<tr>
+		<td>Postal Code:</td>
+		<td>@@postal</td>
+	</tr>
+	</tbody>
+</table>
+<p>
+<form action="@@deleteLink" method="post">
+	<a href="@@editLink">Edit</a>
+	<a href="@@cancelLink">Back</a>
+	<input type="submit" value="Delete" />
+</form>
+</p>
+</body>
+</html>

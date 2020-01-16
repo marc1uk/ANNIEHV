@@ -1,0 +1,26 @@
+<%
+//
+// Terminal_Emulation.esp
+//
+// This script shows the current display as internally reconstructed 
+// Inputs from the HTTP Method VI:
+// Display
+
+var display = form["Display"];
+var errortime = form["Timestamp"];
+%>
+
+<html>
+<title>CAENSY527 - Alarm Screencap</title>
+<head></head>
+<body>
+<h1>Screencap of Last Alarm Read</h1>
+<pre style="font-family: 'Lucida Console', Monaco, monospace; font-size: 12px; line-height: 8px">
+@@display
+</pre>
+
+@@errortime
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

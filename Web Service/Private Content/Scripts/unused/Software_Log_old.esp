@@ -1,0 +1,83 @@
+<%
+//
+// Software_Log.esp
+//
+// This script presents a summary of status, currents, and max/min active voltage on each card.
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var error_log_file = form["Error_Log_File"];
+var error_log = form["Error_Log"];
+%>
+
+<html>
+<title>Software Error Log</title>
+<body>
+<br><br>
+<b>Current Error Log</b>: @@error_log_file<br><br>
+<form action="/CAEN_HV/Software_Log/StartNewProgLog" method="post" enctype="multipart/form-data" id="StartNewLog">
+	<input type="submit" name="btnStartNewProgLog" id="btnStartNewProgLog" value="Start New File" />
+</form>
+<br><br>
+
+<div id="alarm_history_table">
+</div>
+
+<script>
+	var myTableDiv = document.getElementById("alarm_history_table");
+	var table = document.createElement('TABLE');
+	var tableBody = document.createElement('TBODY');
+
+	table.border = '1';
+	table.appendChild(tableBody);
+
+	var tr = document.createElement('TR');
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("Timestamp"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("Error Code"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("Error Source"));
+	tr.appendChild(th);
+	tableBody.appendChild(tr);
+
+	var errlog = "@@error_log";
+	var err_log_array = errlog.split(/r/);
+
+	if(false){
+
+	for (i = 0; i < err_log_array.length; i++) {
+		var err_array_row = err_log_array[i];
+		var err_array_entry = err_array_row.split(",");
+    		var tr = document.createElement('TR');
+		for (j = 0; j <  err_array_entry.length; j++){
+			var entrytext = err_array_entry[i][j];
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(entrytext));
+			tr.appendChild(td);
+		}
+    		tableBody.appendChild(tr);
+	}
+	myTableDiv.appendChild(table);
+
+	} else {
+
+		var err_array_entry = errlog.split(",");
+    		var tr = document.createElement('TR');
+		for (j = 0; j <  err_array_entry.length; j++){
+			var entrytext = err_array_entry[j];
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(entrytext));
+			tr.appendChild(td);
+		}
+    		tableBody.appendChild(tr);
+		myTableDiv.appendChild(table);
+
+	}
+	
+</script>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

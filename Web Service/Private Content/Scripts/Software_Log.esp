@@ -1,0 +1,47 @@
+<%
+//
+// Software_Log.esp
+//
+// This script presents a summary of status, currents, and max/min active voltage on each card.
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var error_log_file = form["Error_Log_File"];
+var error_log_size = form["Error_Log_Size"];
+%>
+
+<html>
+<title>Software Error Log</title>
+<body>
+<br><br>
+<b>Current Error Log</b>: @@error_log_file<br><br>
+<form action="/CAEN_HV/Software_Log/StartNewProgLog" method="post" enctype="multipart/form-data" id="StartNewLog">
+	<input type="submit" name="btnStartNewProgLog" id="btnStartNewProgLog" value="Start New File" />
+</form>
+<br><br>
+
+<table border="1">
+	<thead>
+		<tr>
+			<th>Timestamp</th>	<!-- <th> </th> defines an html header cell -->
+			<th>Error Code</th>
+			<th>Error Source</th>
+		</tr>
+	</thead>
+	<tbody>
+<%
+	// Generate a row for each channel.
+	for (var i = 0; i < error_log_size; i++)
+	{
+			write('<tr>');
+			write('<td>' + form["Timestamp"    + i] + '</td>\n');	// <td> </td> defines an html table cell
+			write('<td>' + form["Code"         + i] + '</td>\n');	
+			write('<td>' + form["Source"       + i] + '</td>\n');
+			write('</tr>');
+	}
+%>
+	</tbody>
+</table>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

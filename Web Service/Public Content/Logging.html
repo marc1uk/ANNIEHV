@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <title>Channel Monitoring</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+</head>
+<body>
+    <h1>Monitor Channels</h1>
+    <h3>Export Data</h3>
+	<form action="/AddressBook/Data/Export" method="get">
+		<p><input type="checkbox" name="logging	" id="logging" value="1" /><label for="favorites">Enable logging to file</label></p>
+		<p><input type="submit" value="Export" /></p>
+	</form>
+	<h3>Import Data</h3>
+	<form action="/AddressBook/Data/Import" method="post" enctype="multipart/form-data">
+		<p><label for="dataFile">Data File:</label> <input type="file" name="dataFile" id="dataFile" /></p>
+		<p><input type="submit" value="Import" /></p>
+	</form>
+	<p><a href="/AddressBook/">Back</a></p>
+</body>
+</html>
+
+
+********* html files cannot interact with controls or indicators - they are ONLY for navigating to subvi pages

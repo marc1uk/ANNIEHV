@@ -1,0 +1,90 @@
+<%
+//
+// Edit.esp
+//
+// This script provides editing fields for a contact. Optionally, the fields
+// can be pre-populated with data for an existing contact.
+//
+// Inputs from the HTTP Method VI:
+//
+//		cancelLink:	A URL for canceling the edit.
+//		actionLabel:	The label to display on the submit button.
+//		id:				Optional, the ID of the contact being edited to include
+//							in the form.
+//		lname:			Optional, the initial last name for the contact.
+//		fname:			Optional, the initial first name for the contact.
+//		mname:		Optional, the initial middle name for the contact.
+//		phone:			Optional, the initial phone number for the contact.
+//		street:			Optional, the initial street address for the contact.
+//		city:				Optional, the initial city for the contact.
+//		state:			Optional, the initial state for the contact.
+//		postal:			Optional, the initial postal code for the contact.
+//		favorite:		Optional, 1 if the contact is a favorite, 0 if not.
+//    
+// Variables are retrieved by name using the form['varname'] construct.
+// We store the retrieved values in local variables to be able to
+// use them in the rendered text as '@@varname'.
+//
+//
+var cancelLink = form["cancelLink"];
+var actionLabel = form["actionLabel"];
+
+var id = form["id"];
+var lname = form["lname"];
+var fname = form["fname"];
+var mname = form["mname"];
+var phone = form["phone"];
+var street = form["street"];
+var city = form["city"];
+var state = form["state"];
+var postal = form["postal"];
+var favorite = form["favorite"];
+%>
+<html>
+<title>@@actionLabel Contact - Address Book</title>
+<body>
+<h1>@@actionLabel Contact</h1>
+<form action="/AddressBook/Contacts/EditContact" method="post">
+<input type="hidden" name="id" value="@@id" />
+<input type="hidden" name="favorite" value="@@favorite" />
+<table border="0">
+	<tbody>
+	<tr>
+		<td>Last Name:</td>
+		<td><input name="lname" value="@@lname" /></td>
+	</tr>
+	<tr>
+		<td>First Name:</td>
+		<td><input name="fname" value="@@fname" /></td>
+	</tr>
+	<tr>
+		<td>Middle Name:</td>
+		<td><input name="mname" value="@@mname" /></td>
+	</tr>
+	<tr>
+		<td>Phone:</td>
+		<td><input name="phone" value="@@phone" /></td>
+	</tr>
+	<tr>
+		<td>Street:</td>
+		<td><input name="street" value="@@street" /></td>
+	</tr>
+	<tr>
+		<td>City:</td>
+		<td><input name="city" value="@@city" /></td>
+	</tr>
+	<tr>
+		<td>State:</td>
+		<td><input name="state" value="@@state" /></td>
+	</tr>
+	<tr>
+		<td>Postal Code:</td>
+		<td><input name="postal" value="@@postal" /></td>
+	</tr>
+	</tbody>
+</table>
+<p><input type="submit" value="@@actionLabel" /></p>
+</form>
+<p><a href="@@cancelLink">Cancel</a></p>
+</body>
+</html>

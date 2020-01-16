@@ -1,0 +1,74 @@
+<%
+//
+// CrateMap.esp
+//
+// This script presents the crate map including full card specs
+// or return to the main menu
+
+// Inputs from the HTTP Method VI:
+// num_crates, tot_pos_cards, tot_neg_cards, tot_pos_chans, tot_neg_chans
+// Crate_Address#, Crate_Model#, Crate_FWVer#, Crate_NumCards#; where # = crate index(from 0!)
+// Crate_Address is CAENnet address and doesn't necessarily correspond to crate index + 1 (but for now it will)
+// Slot_Num#.#, Card_Model#.#, Num_Channels#.#, Polarity#.#, Vmax#.#, Imax#.#, Revision#.#; where #.# is
+// crate index.card index, card index numbered from 0. 
+
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var num_crates = form["num_crates"] * 1; //multiply by 1 to turn into a number (data type is always dynamic and depends on operation)
+var num_cards = new Array();
+var tot_pos_cards = form["tot_pos_cards"];
+var tot_pos_chans = form["tot_pos_chans"];
+var tot_neg_cards = form["tot_neg_cards"];
+var tot_neg_chans = form["tot_neg_chans"];
+for ( var crate = 0; crate < num_crates; crate++) {
+	num_cards[crate] = form["Crate_NumCards" + crate] * 1;
+}
+
+%>
+
+<html>
+<title>CAENSY527 - Crate Map</title>
+<body>
+<h1>Crate Map</h1>
+<p>Num Crates: @@num_crates</p>	<!-- can use @@ to refer to variables defined above -->
+<p>Total Num Positive Cards: @@tot_pos_cards</p>
+<p>Total Num Positive Channels: @@tot_pos_chans</p>
+<p>Total Num Negative Cards: @@tot_neg_cards</p>
+<p>Total Num Negative Channels: @@tot_neg_chans</p>
+<table border="1">
+<%
+	// Generate a header row for each crate
+	for (var crate = 0; crate < num_crates;crate++) {
+%>    
+		<thead>
+		<tr>	<!-- <tr></tr> defines a row in a table -->
+<%
+		WriteCrateHeader(); 
+%>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+<% 
+		WriteCrateData(crate); 
+%>
+		</tr>
+<%
+		for (var card = 0; card < num_cards[crate]; card++) { 
+%>
+			<tr>
+<%
+			WriteCardData(crate,card);
+%>
+			</tr>
+<%	
+		}	// end of cards loop
+%>
+	</tbody>
+<%  
+	}	// end of crates loop
+%>
+</table>
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

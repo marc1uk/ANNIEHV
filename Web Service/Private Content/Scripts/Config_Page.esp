@@ -1,0 +1,179 @@
+<%
+//
+// EditConfig.esp
+//
+// This script shows current config settings and lets the user edit them
+//
+// Inputs from the HTTP Method VI:
+// serial COM port, error (status, code, source), service restart and stop? 
+//
+var caen_serial_port = form["CAEN_Serial_Port"];
+var lecroy_1_serial_port = form["LeCroy_1_Serial_Port"];
+var lecroy_2_serial_port = form["LeCroy_2_Serial_Port"];
+var error_status = form["Error_Status"];
+var error_code = form["Error_Code"];
+var error_source = form["Error_Source"];
+var error_timestamp = form["Error_Timestamp"];
+var current_error_log = form["Current_Error_Log"];
+var current_event_log = form["Current_Event_Log"];
+var chan_log_directory = form["Chan_Log_File"];
+var chan_log_enabled = form["Chan_Log_Enabled"];
+var bytes_read = form["Bytes_Read"];
+//var read_buffer = form["Read_Buffer"];
+var read_buffer_bs = form["Read_Buffer_BS"];
+var read_buffer_norm = form["Read_Buffer_Norm"];
+var read_buffer_lecroy1 = form["Read_Buffer_Lecroy1"];
+var read_buffer_lecroy2 = form["Read_Buffer_Lecroy2"];
+var bs_view = form["ReadBufferView"];
+var status_message = form["Status_Message"];
+%>
+<html>
+<title>Configuration</title>
+<body>
+<h1>Status Information</h1>
+<b>CAEN Serial Port:</b> @@caen_serial_port<br>
+<!--
+<form action="/CAEN_HV/Config/SetSerialPort/?SerialPort=@@caen_serial_port">
+	<input type=number/><input type="submit" value="Update"/>
+	<input name="crate_number" type="hidden" value="0" />
+</form>
+-->
+
+<b>LeCroy 1 Serial Port:</b> @@lecroy_1_serial_port<br>
+<!--
+<form action="/CAEN_HV/Config/SetSerialPort/?SerialPort=@@lecroy_1_serial_port">
+	<input type=number/><input type="submit" value="Update"/>
+	<input name="crate_number" type="hidden" value="1" />
+</form>
+-->
+
+<b>LeCroy 2 Serial Port:</b> @@lecroy_2_serial_port<br>
+<!--
+<form action="/CAEN_HV/Config/SetSerialPort/?SerialPort=@@lecroy_2_serial_port">
+	<input type=number/><input type="submit" value="Update"/>
+	<input name="crate_number" type="hidden" value="2" />
+</form>
+-->
+
+<form action="/CAEN_HV/Config/KillAll" method="post">
+	<p><input type="submit" value="Kill All Channels" /></p>
+</form>
+
+<% 
+	if(error_status=="1"){
+		write('<b>Last Error code:</b> ' + error_code + '<br>');
+		write('<b>Last Error Source:</b> ' + error_source + '<br>');
+		write('<b>Last Error Timestamp:</b> ' + error_timestamp + '<br>');
+	} else {
+		write('No Errors So Far<br>');
+	}
+%>
+<br>
+<!-- <b>Status Message:</b> @@status_message<br><br> -->
+<b>Event Log File:</b> @@current_event_log<br>
+<form action="/CAEN_HV/Config/StartNewEventLog" method="post" id="StartNewEvLogForm">	
+	<input type="submit" name="NewEvLog" id="NewEvLog" value="Start New Event Log"; />
+</form>
+<b>Software Log File:</b> @@current_error_log<br>
+<form action="/CAEN_HV/Config/StartNewErrorLog" method="post" id="StartNewErrorLogForm">	
+	<input type="submit" name="NewErrLog" id="NewErrLog" value="Start New Error Log"; />
+</form>
+
+<b>Channel Log Directory:</b> @@chan_log_directory <br>
+<form action="/CAEN_HV/Config/StartNewChannelLog" method="post" enctype="multipart/form-data" id="StartNewChannelLogForm">
+	<input type="submit" name="btnStartNewChanLog" id="btnStartNewChanLog" value="Start New Log Directory" />
+</form>
+<form action="/CAEN_HV/Config/EnableDisableLogging/" method="post" id="StartStopLogging">
+	<% if(chan_log_enabled==1) { %>
+		<p><input type="checkbox" name="enable_logbox" id="enable_logbox" checked onclick="enLogChange(this);" /><label for="enable_logbox"> Currently Logging</label></p>
+	<% } else { %>
+		<p><input type="checkbox" name="enable_logbox" id="enable_logbox" onclick="enLogChange(this);" /><label for="enable_logbox"> Not Logging</label></p>
+	<% } %>
+	<noscript>
+		<p><input type="submit" value="Submit changes" /></p>		
+	</noscript>
+</form>
+<script>
+	function enLogChange(enable_logbox){
+		chan_log_enabled=enable_logbox.checked;
+		document.getElementById("StartStopLogging").submit();
+	}
+</script>
+
+<p>Last CAEN read buffer: </p>
+<table border="1">
+	<tr>
+		<td>
+			<% if(bs_view == 1) { %>
+				<p id="read_buffer_displayed">@@read_buffer_bs</p>
+			<% } else { %>
+				<p id="read_buffer_displayed">@@read_buffer_norm</p>
+			<% } %>
+		</td>
+	</tr>
+</table>
+
+<p>
+<% if (bs_view == 1) { %>
+	<input type="checkbox" id="bs_viewbox" checked onclick="bsViewChange(this);"/>
+<%
+} else { %>
+	<input type="checkbox" id="bs_viewbox" onclick="bsViewChange(this);"/>
+<% } %>
+<label for="bs_viewbox"> '\' codes view</label></p>
+
+<script>
+	function bsViewChange(bs_viewbox) { 
+	  if (bs_viewbox.checked) {
+		document.getElementById("read_buffer_displayed").innerHTML = "<% write(read_buffer_bs); %>";
+	  } else { 
+		document.getElementById("read_buffer_displayed").innerHTML = "<% write(read_buffer_norm); %>";
+	  } 
+	}
+
+	function display(msg) { 
+		var p = document.createElement('p');
+		p.innerHTML = msg;
+		document.body.appendChild(p);
+	}
+</script>
+
+<noscript>
+	<p>Javascript disabled: refresh browser to update view.</p>
+</noscript>
+
+<p>Last LeCroy 1 read buffer: </p>
+<table border="1">
+	<tr>
+		<td>
+			<p id="read_buffer_lecroy1">@@read_buffer_lecroy1</p>
+		</td>
+	</tr>
+</table>
+
+<p>Last LeCroy 2 read buffer: </p>
+<table border="1">
+	<tr>
+		<td>
+			<p id="read_buffer_lecroy2">@@read_buffer_lecroy2</p>
+		</td>
+	</tr>
+</table>
+
+<form action="/CAEN_HV/Config/DoRead" method="post">
+	<p><input type="submit" value="Read" /></p>
+</form>
+
+<form action="/CAEN_HV/Config/DoWrite" method="post">
+	<p><textarea name="write_buffer" value="" rows="2" cols="50" placeholder="use {left}, {enter} etc for control keys."></textarea></p>
+	<p><input type="submit" value="Write" /></p>
+</form>
+
+<form action="/CAEN_HV/Config/RefreshCrates" method="post">
+	<p><input type="submit" value="Reload Crate Map" /></p>
+</form>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>
+

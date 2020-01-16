@@ -1,0 +1,46 @@
+<%
+//
+// Event_Log.esp
+//
+// 
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var event_log_file = form["Event_Log_File"];
+var event_log_size = form["Event_Log_Size"]*1;
+%>
+
+<html>
+<title>HV Event Log</title>
+<body>
+<br><br><b>Current Event Log</b>: @@event_log_file<br><br>
+<form action="/CAEN_HV/Event_Log/StartNewEvLog" method="post" enctype="multipart/form-data" id="StartNewLog">
+	<input type="submit" name="btnStartNewEvLog" id="btnStartNewEvLog" value="Start New File" />
+</form>
+<br><br>
+
+<table border="1">
+	<thead>
+		<tr>
+			<th>Timestamp</th>	<!-- <th> </th> defines an html header cell -->
+			<th>Event Type</th>
+			<th>Event Information</th>
+		</tr>
+	</thead>
+	<tbody>
+<%
+	// Generate a row for each channel.
+	for (var i = 0; i < event_log_size; i++)
+	{
+			write('<tr>');
+			write('<td>' + form["Timestamp"    + i] + '</td>\n');	// <td> </td> defines an html table cell
+			write('<td>' + form["Type"         + i] + '</td>\n');	
+			write('<td>' + form["Info"         + i] + '</td>\n');
+			write('</tr>');
+	}
+%>
+	</tbody>
+</table>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>

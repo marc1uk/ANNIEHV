@@ -1,0 +1,271 @@
+<%
+//
+// Summary_Page.esp
+//
+// This script presents a summary of status, currents, and max/min active voltage on each card.
+
+include("Channel_Common_Funcs.ejs"); // Include paths are relative to the ESP file.
+var summary_status = form["Summary_Status"];
+var error_status = form["Error_Status"];
+var error_code = form["Error_Code"];
+var error_source = form["Error_Source"];
+var error_timestamp = form["Error_Timestamp"];
+var bytes_read = form["Bytes_Read"];
+var card_nums = form["Card_Nums"];
+var card_currents = form["Card_Currents"];
+var card_max_is = form["Card_Max_Is"];
+var card_min_is = form["Card_Min_Is"];
+var card_max_vs = form["Card_Max_Vs"];
+var card_min_vs = form["Card_Min_Vs"];
+var timestamp = form["Timestamp"];
+var shifter_notes = form["Shifter_Notes"];
+var mute = form["Mute"] * 1;
+var mutecolour="colour";
+if(mute==0){mutecolour="black";} else {mutecolour="red";}
+var mutetext="mutetext";
+if(mute==0){mutetext="sound alerts on";} else {mutetext="sound alerts off";}
+var dosound = form["DoSound"]*1;
+var xchans = form["XChans"];	// table of information about the important channels
+%>
+
+<html>
+<head> <meta http-equiv="refresh" content="5"> </head>	<!-- makes the page refresh once every 5 secs -->
+<title>CAENSY527 - System Overview</title>
+<body>
+<!-- <br><br> -->
+<h1>
+<span id="summary" style="color: #ffffff; background-color: #ff0000">@@summary_status</span>
+<script>
+	var statusstring = "@@summary_status";
+	var iswarning = statusstring.search("warning") + statusstring.search("alert");
+	if(statusstring=="Everything is awesome"){
+		document.getElementById("summary").style.backgroundColor="#008000";
+	} else if(iswarning!=-2) {
+		document.getElementById("summary").style.backgroundColor="#ff9900";
+	} else {
+		document.getElementById("summary").style.backgroundColor="#ff0000";
+	}
+</script>
+
+<% if(dosound==1&&mute==0){ %>
+<audio src="../yunos_sms.mp3" autoplay>
+<p>If you are reading this, it is because your browser does not support the audio element.		 </p>
+</audio>
+<% } %>
+
+</h1>
+<% if(summary_status!="Everything is awesome"){ %>
+<form action="/CAEN_HV/Summary_Page/ClearAlarms" method="post" enctype="multipart/form-data" id="ClearAlarmForm">
+	<input type="submit" name="btnClearAlarm" id="btnClearAlarm" value="Clear" />
+</form>
+<% } %>
+<b>Timestamp</b>: @@timestamp
+<br>
+<div id="summary_table">
+</div>
+<br>
+<div id="xchans_table">
+</div>
+<br>
+
+<script>
+// summary table of card information
+	// these strings have one line per crate, each line is a csv per cards
+	var canum = "@@card_nums";
+	var cacar = "@@card_currents";
+	var carimx = "@@card_max_is";
+	var carimn = "@@card_min_is";
+	var carvmx = "@@card_max_vs";
+	var carvmn = "@@card_min_vs";
+	
+	// turn into an array per crate
+	// canum.split(/[\r\n]+/); << split by newline.
+	//  but doesn't work because newlines in string definition result in 
+	// "unterminated string" error in html code!
+	var canum_array = canum.split("@");
+	var cacar_array = cacar.split("@");
+	var carimx_array = carimx.split("@");
+	var carimn_array = carimn.split("@");
+	var carvmx_array = carvmx.split("@");
+	var carvmn_array = carvmn.split("@");
+	
+	for (cratei = 0; cratei < canum_array.length; cratei++){
+		
+		// get the line for this crate
+		var canum_thiscrate = canum_array[cratei];
+		var cacar_thiscrate = cacar_array[cratei];
+		var carimx_thiscrate = carimx_array[cratei];
+		var carimn_thiscrate = carimn_array[cratei];
+		var carvmx_thiscrate = carvmx_array[cratei];
+		var carvmn_thiscrate = carvmn_array[cratei];
+		
+		// turn into an array per card
+		var card_nums_array = canum_thiscrate.split(",");
+		var card_currents_array = cacar_thiscrate.split(",");
+		var card_max_is_array = carimx_thiscrate.split(",");
+		var card_min_is_array = carimn_thiscrate.split(",");
+		var card_max_vs_array = carvmx_thiscrate.split(",");
+		var card_min_vs_array = carvmn_thiscrate.split(",");
+		
+		var myTableDiv = document.getElementById("summary_table")
+		var table = document.createElement('TABLE')
+		var tableBody = document.createElement('TBODY')
+		
+		table.border = '1'
+		table.appendChild(tableBody);
+		
+		var tr = document.createElement('TR');
+		tableBody.appendChild(tr);
+		
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Crate Number\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Card Number\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Total Current Draw\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Highest Active I\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Lowest Active I\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Highest Active V\u00A0"));
+		tr.appendChild(th);
+		var th = document.createElement('TH');
+		th.appendChild(document.createTextNode("\u00A0Lowest Active V\u00A0"));
+		tr.appendChild(th);
+
+		var td = document.createElement('TD');
+
+		for (i = 0; i < card_currents_array.length; i++) {
+			var tr = document.createElement('TR');
+			
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(cratei));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_nums_array[i]));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_currents_array[i]));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_max_is_array[i]));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_min_is_array[i]));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_max_vs_array[i]));
+			tr.appendChild(td);
+			var td = document.createElement('TD');
+			td.appendChild(document.createTextNode(card_min_vs_array[i]));
+			tr.appendChild(td);
+			tableBody.appendChild(tr);
+		}
+		myTableDiv.appendChild(table);
+	}
+	
+</script>
+
+<script>
+// similar code to produce the table of important channels
+	var tablestring = "@@xchans";
+	var newline = '\n';
+	var therows = tablestring.split(newline);
+	for(var i=0; i<therows.length; i++){
+		therows[i]=therows[i].split(",");
+	}
+
+	var myTableDiv = document.getElementById("xchans_table")
+	var table = document.createElement('TABLE')
+	var tableBody = document.createElement('TBODY')
+
+	table.border = '1'
+	table.appendChild(tableBody);
+
+	var tr = document.createElement('TR');
+	tableBody.appendChild(tr);
+
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0Channel Name\u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0Powered\u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0Status\u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0 \u00A0 \u00A0Vset\u00A0 \u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0 \u00A0 \u00A0Vmon\u00A0 \u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0 \u00A0Imon\u00A0 \u00A0"));
+	tr.appendChild(th);
+	var th = document.createElement('TH');
+	th.appendChild(document.createTextNode("\u00A0Timestamp\u00A0"));
+	tr.appendChild(th);
+
+	var td = document.createElement('TD');
+	var numrows = therows.length;
+	var numcols = therows[0].length;
+	var elzz = therows[0][0];
+
+	for (i = 0; i < therows.length; i++) {
+		var tr = document.createElement('TR');
+		for(j = 0; j<7; j++){	//j<therows[0].length
+			var td = document.createElement('TD');
+			var thetext = therows[i][j];
+			if(j==1){
+				if(thetext==0){thetext="OFF";} else {thetext="on";};
+			} else if(j==2){
+				if(thetext=="" && therows[i][j-1]==1){thetext="ok";}
+			} else if(j==5){
+				if(therows[i][7]<5){thetext="--";}	//negative card
+			}
+			td.appendChild(document.createTextNode(thetext));
+			if((j==1 && thetext=="OFF")||(j==2 && thetext!="ok")){
+				td.setAttribute('style', 'color: red');
+			} else if(j==1 || j==2) {
+				td.setAttribute('style', 'color: green');
+			} else if(therows[i][1]=="0"){
+				td.setAttribute('style', 'color: grey');
+			}
+			tr.appendChild(td);
+		}
+		tableBody.appendChild(tr);
+	}
+	myTableDiv.appendChild(table);
+
+</script>
+<!--
+Shifter Notes:<br>
+<form action="/CAEN_HV/Summary_Page/SetShifterNotes" method="post">
+	<textarea name="shifter_notes" value="@@shifter_notes" cols="80" rows="5" style="width: 800px; height: 100px; padding: 1px; font-family:Georgia; font-size: 16px;">@@shifter_notes</textarea> <input type="submit" value="Save"/>
+</form>
+-->
+<b>Last program error at:</b> @@error_timestamp<br>
+<b>The error was:</b> @@error_source<br>
+<br>
+
+<input type="submit" onclick="do_mute(this);" value="@@mutetext" style="color: @@mutecolour"/>
+
+<script>
+function do_mute(mutebtn){
+	var muteval = @@mute;
+	var newmute=0;
+	if(muteval==0){newmute=1;} else {newmute=0;}
+	window.location.replace("?Mute="+newmute)
+}
+</script>
+
+<p><a href="/CAEN_HV/">Back</a></p>
+</body>
+</html>
